@@ -1,0 +1,16 @@
+let StartDate1 = ago(31d);
+let EndDate1 = ago(7d);
+let StartDate2 = ago(7d);
+let EndDate2 = ago(1h);
+union * 
+| where TimeGenerated between(StartDate1 .. EndDate1)
+| summarize TotalIngestBytes = sum(_BilledSize) by Type
+| join (
+union * 
+| where TimeGenerated between(StartDate2 .. EndDate2)
+| summarize TotalIngestBytes2 = sum(_BilledSize) by Type
+) on Type
+| extend IngestionDifference = TotalIngestBytes - TotalIngestBytes2
+| extend IngestionTrend = case(IngestionDifference > 0, "Ingestion Decreased", IngestionDifference < 0, "Ingestion Increased", "No Difference")
+| project Type, TotalIngestBytes, TotalIngestBytes2, IngestionDifference, IngestionTrend
+| order by Type
