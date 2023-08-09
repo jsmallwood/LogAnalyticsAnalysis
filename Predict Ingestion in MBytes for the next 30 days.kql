@@ -1,0 +1,10 @@
+let startDate = startofday(ago(30d)); // go back in time nn days
+let endDate = now(); // what is the date now
+let projectTo = now()+30d; // project forward nn days
+let projectForward = 30; // must be same as projectTo value
+union withsource = tt *
+| where TimeGenerated between (startDate .. endDate )
+| where _IsBillable == True
+| make-series BillingVolumeNow = avg(_BilledSize) default=0 on TimeGenerated in range(startDate, projectTo, 1h)
+| extend BillingForecast = series_decompose_forecast(BillingVolumeNow, projectForward*24)
+| render timechart title = "Predicted Data Capacity in 30days "
