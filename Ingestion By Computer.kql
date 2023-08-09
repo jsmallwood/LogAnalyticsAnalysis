@@ -1,0 +1,8 @@
+let pricebytes = 2.76 / 104857600;
+union * 
+| where _IsBillable == true or _IsBillable == false
+| extend ComputerName = tolower(tostring(split(Computer, '.')[0]))
+| where ComputerName != "" and ComputerName !contains "deprecated"
+| summarize TotalIngestBytes=sum(_BilledSize) by ComputerName
+| extend Cost = TotalIngestBytes * pricebytes
+| order by Cost desc
