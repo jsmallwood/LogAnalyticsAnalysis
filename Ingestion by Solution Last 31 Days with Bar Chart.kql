@@ -1,0 +1,7 @@
+Usage 
+| where TimeGenerated > startofday(ago(31d))
+| where IsBillable == true
+| where TimeGenerated > startofday(ago(31d))
+| where IsBillable == true
+| summarize BillableDataGB = sum(Quantity) / 1000. by bin(TimeGenerated, 31d), DataType 
+| render barchart
