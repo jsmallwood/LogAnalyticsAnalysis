@@ -1,0 +1,6 @@
+let pricebytes = 2.76 / 104857600;
+union * 
+| where _IsBillable == true or _IsBillable == false
+| summarize TotalIngestBytes=sum(_BilledSize) by Type
+| extend Cost = TotalIngestBytes * pricebytes
+| order by TotalIngestBytes
