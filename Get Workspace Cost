@@ -1,0 +1,18 @@
+let priceGB = 2.76;
+let TotalIngestion=toscalar(
+    Usage
+    | where TimeGenerated > ago(30d)
+    | summarize IngestionVolume=sum(Quantity));
+Usage
+| where TimeGenerated > ago(30d)
+| project TimeGenerated, DataType, Solution, Quantity, IsBillable
+| summarize
+    IngestedEntries = count(), 
+    TableSize = sum(estimate_data_size(*)),
+    SizePerEntryBytes = 1.0 * sum(estimate_data_size(*)) / count(),
+    IngestionVolumeGB=sum(Quantity/1024),
+    IngestionPercent = (sum(Quantity)) / TotalIngestion,
+    IngestionCost = sum(Quantity/1024) * priceGB,
+    Billable = any(IsBillable)
+    by DataType, Solution
+| sort by Solution asc, DataType asc
