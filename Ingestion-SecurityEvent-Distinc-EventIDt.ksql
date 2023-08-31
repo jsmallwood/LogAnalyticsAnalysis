@@ -1,0 +1,5 @@
+SecurityEvent
+| where TimeGenerated > ago(31d)
+| where _IsBillable == true
+| distinct EventID, Activity, Channel, EventSourceName
+| project EventID, Activity, Channel, EventSourceName
