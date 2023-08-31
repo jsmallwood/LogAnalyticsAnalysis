@@ -1,0 +1,45 @@
+Usage 
+| where TimeGenerated > startofday(ago(31d)) 
+| where IsBillable == true 
+| summarize BillableDataGB = sum(Quantity) by Solution, DataType 
+| top 10 by BillableDataGB 
+| sort by BillableDataGB desc
+
+
+Usage 
+| where TimeGenerated > startofday(ago(31d))
+| where IsBillable == true 
+| where TimeGenerated > startofday(ago(31d)) 
+| where IsBillable == true 
+| summarize BillableDataGB = sum(Quantity) / 1000. by bin(TimeGenerated, 1d), DataType 
+| render barchart
+
+AzureDiagnostics 
+| summarize AggregatedValue = count() by ResourceProvider, ResourceId
+
+
+union withsource = tt * 
+| where TimeGenerated >= ago(31d) 
+| summarize count() by bin(TimeGenerated,1d), Source=tt 
+| render timechart title = "Monthly growth"
+
+
+let SolutionName= "AzureDiagnostics"; 
+union withsource = tt * 
+| where TimeGenerated > ago(1d) 
+| where _IsBillable == true 
+| where tt == SolutionName 
+| summarize MBytes=round(sum(_BilledSize/1024/1024),2) by Solution=tt , _IsBillable 
+| sort by MBytes nulls last
+
+
+union withsource = tt * 
+| where TimeGenerated > ago(1d) 
+| where _IsBillable == true 
+| where tt == "AzureDiagnostics" and ResourceType=="WORKFLOWS/RUNS/ACTIONS" 
+| summarize MBytes=round(sum(_BilledSize/1024/1024),2) by Solution=tt ,
+ _IsBillable ,
+ Resource 
+| sort by MBytes nulls last
+
+

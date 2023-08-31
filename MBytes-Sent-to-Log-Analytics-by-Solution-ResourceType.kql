@@ -1,0 +1,6 @@
+union withsource = tt *
+| where TimeGenerated > ago(1d)
+| where _IsBillable == true
+| where tt == "AzureDiagnostics" and ResourceType == "LogicApps"
+| summarize MBytes=round(sum(_BilledSize/1024/1024),2) by Solution=tt , _IsBillable ,Resource
+| sort by MBytes nulls last

@@ -1,0 +1,8 @@
+let SolutionName= "AzureDiagnostics";
+union withsource = tt *
+| where TimeGenerated > ago(1d)
+| where _IsBillable == true
+| where tt == SolutionName
+| summarize MBytes=round(sum(_BilledSize/1024/1024),2) by Solution=tt , _IsBillable
+| sort by MBytes nulls last
+| summarize BillableDataMB = sum(Quantity), BillableDataGB = sum(Quantity) / 1000. by Solution, DataType

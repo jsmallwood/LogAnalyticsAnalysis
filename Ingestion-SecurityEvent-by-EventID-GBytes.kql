@@ -1,0 +1,6 @@
+SecurityEvent
+| where TimeGenerated > ago(31d)
+| where _IsBillable == true
+| summarize GBytes=round(sum(_BilledSize/1024/1024/1024),2) by _IsBillable, EventID, Activity, Channel, EventSourceName
+| order by GBytes, EventID, Activity, Channel, EventSourceName
+| project EventID, Activity, Channel, EventSourceName, GBytes
